@@ -12,6 +12,9 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\PayPalController;
 use SebastianBergmann\CodeCoverage\Report\Html\Dashboard;
 
+Route::get('/ping', function () {
+    return response()->json(['status' => 'success', 'message' => 'API is working']);
+});
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
