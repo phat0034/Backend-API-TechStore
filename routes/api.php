@@ -145,13 +145,11 @@ Route::get('/list-files', function () {
 Route::get('/check-files', function () {
     return response()->json(File::allFiles(app_path('Models')));
 });
-Route::get('/storage/uploads/product/{filename}', function ($filename) {
-    $path = storage_path('app/public/uploads/product/' . $filename);
 
-    if (!file_exists($path)) {
-        \Log::error('File not found: ' . $path);
-        abort(404);
-    }
-
-    return response()->file($path);
+Route::get('/upload-debug', function() {
+    return response()->json([
+        'storage_path' => storage_path('app/public/uploads'),
+        'is_writable' => is_writable(storage_path('app/public/uploads')),
+        'disk_config' => config('filesystems.disks.public')
+    ]);
 });
