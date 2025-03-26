@@ -137,3 +137,6 @@ Route::get('/debug-user', function () {
 
     return response()->json($user ?: ['message' => 'No users found']);
 });
+Route::get('/list-files', function () {
+    return response()->json(scandir(app_path()));
+});
