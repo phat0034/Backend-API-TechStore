@@ -12,6 +12,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\PayPalController;
 use App\Models\User;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\File;
 
 use SebastianBergmann\CodeCoverage\Report\Html\Dashboard;
 
@@ -139,4 +140,7 @@ Route::get('/debug-user', function () {
 });
 Route::get('/list-files', function () {
     return response()->json(scandir(app_path()));
+});
+Route::get('/check-files', function () {
+    return response()->json(File::allFiles(app_path('Models')));
 });
