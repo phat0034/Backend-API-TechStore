@@ -13,6 +13,7 @@ use App\Http\Controllers\PayPalController;
 use App\Models\User;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
 
 use SebastianBergmann\CodeCoverage\Report\Html\Dashboard;
 
@@ -143,4 +144,14 @@ Route::get('/list-files', function () {
 });
 Route::get('/check-files', function () {
     return response()->json(File::allFiles(app_path('Models')));
+});
+Route::get('/storage/uploads/product/{filename}', function ($filename) {
+    $path = storage_path('app/public/uploads/product/' . $filename);
+
+    if (!file_exists($path)) {
+        \Log::error('File not found: ' . $path);
+        abort(404);
+    }
+
+    return response()->file($path);
 });
