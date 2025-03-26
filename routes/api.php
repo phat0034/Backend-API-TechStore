@@ -10,6 +10,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\PayPalController;
+use App\Models\User;
+use Illuminate\Support\Facades\Schema;
+
 use SebastianBergmann\CodeCoverage\Report\Html\Dashboard;
 
 Route::get('/ping', function () {
@@ -116,4 +119,21 @@ Route::post('/paypal/capture-order/{orderId}', [PayPalController::class, 'captur
 // Route yêu cầu JWT token
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
+});
+//test api
+Route::get('/debug-user', function () {
+    // Kiểm tra xem model User có tồn tại không
+    if (!class_exists(User::class)) {
+        return response()->json(['error' => 'User model not found'], 500);
+    }
+
+    // Kiểm tra xem bảng users có tồn tại không
+    if (!Schema::hasTable('user')) {
+        return response()->json(['error' => 'Users table not found'], 500);
+    }
+
+    // Lấy một user thử nghiệm
+    $user = User::first();
+
+    return response()->json($user ?: ['message' => 'No users found']);
 });
