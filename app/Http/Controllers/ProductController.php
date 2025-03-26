@@ -321,6 +321,7 @@ class ProductController extends Controller
     }
     function getType(Request $req)
     {
+      try {
         $typeProduct = new typeproduct();
 
         $allTypes = $typeProduct::all();
@@ -329,6 +330,12 @@ class ProductController extends Controller
             'success' => true,
             'data' => $allTypes
         ]);
+      } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'data' => $e->getMessage()
+        ]);
+      }
     }
     function showDetailProduct($id)
     {
