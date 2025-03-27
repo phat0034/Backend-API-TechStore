@@ -146,16 +146,39 @@ Route::get('/check-files', function () {
     return response()->json(File::allFiles(app_path('Models')));
 });
 Route::get('/upload-debug', function () {
-    return response()->json([
+    $paths = [
         'base_path' => base_path(),
         'app_path' => app_path(),
         'storage_path' => storage_path(),
         'public_path' => public_path(),
         'full_uploads_path' => storage_path('app/public/uploads'),
-        'path_exists' => file_exists(storage_path('app/public/uploads')),
-        'is_dir' => is_dir(storage_path('app/public/uploads')),
-        'is_writable' => is_writable(storage_path('app/public/uploads')),
-        'permissions' => substr(sprintf('%o', fileperms(storage_path('app/public/uploads'))), -4),
+    ];
+
+    $checks = [];
+    foreach ($paths as $name => $path) {
+        $checks[$name] = [
+            'path' => $path,
+            'exists' => file_exists($path),
+            'is_dir' => is_dir($path),
+            'readable' => is_readable($path),
+            'writable' => is_writable($path)
+        ];
+    }
+
+    // Thử tạo thư mục
+    $uploadPath = storage_path('app/public/uploads');
+    if (!file_exists($uploadPath)) {
+        try {
+            mkdir($uploadPath, 0755, true);
+            $checks['mkdir_result'] = 'Tạo thư mục thành công';
+        } catch (\Exception $e) {
+            $checks['mkdir_result'] = 'Lỗi tạo thư mục: ' . $e->getMessage();
+        }
+    }
+
+    return response()->json([
+        'paths' => $paths,
+        'checks' => $checks,
         'disk_config' => config('filesystems.disks.public')
     ]);
 });
