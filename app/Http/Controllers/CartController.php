@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\wishlist;
+use App\Models\Wishlist;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
@@ -184,7 +184,7 @@ class CartController extends Controller
     function checkInWishlist(Request $req)
     {
         try {
-            $wishlist = new wishlist();
+            $wishlist = new Wishlist();
             $iduser = Auth::id();
             $id_product = $req->input('id_product');
             $checkWishlist = $wishlist::where('user_id', $iduser)->where('product_id', $id_product)->first();
@@ -202,7 +202,7 @@ class CartController extends Controller
     function getWishlist(Request $req)
     {
         try {
-            $wishlist = new wishlist();
+            $wishlist = new Wishlist();
             $iduser = Auth::id();
             $getWL = DB::table('wishlist as a')
                 ->join('product as b', 'a.product_id', '=', 'b.id')
@@ -224,7 +224,7 @@ class CartController extends Controller
     function addWishlist(Request $req)
     {
         try {
-            $wishlist = new wishlist();
+            $wishlist = new Wishlist();
             $iduser = Auth::id();
             $id_product = $req->input('id_product');
             $checkWishlist = $wishlist::where('user_id', $iduser)->where('product_id', $id_product)->first();
@@ -253,7 +253,7 @@ class CartController extends Controller
     function removeWishlist(Request $req)
     {
         try {
-            $wishlist = new wishlist();
+            $wishlist = new Wishlist();
             $id_wishlist = $req->input('id_wishlist');
             $removeWishlist = $wishlist->where('id', $id_wishlist)->delete();
             if ($removeWishlist) {
