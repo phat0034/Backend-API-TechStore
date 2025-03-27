@@ -285,16 +285,39 @@ class ProductController extends Controller
     }
     function showProductType(Request $req)
     {
-        $product = new Product();
-        $type = new Typeproduct();
-        $sort = $req->input('sort', 'asc');
-        $typename = $req->input('type');
-        $idType = $type->where('name', $typename)->value('id');
-        $getAll = $product->where('idtype', $idType)->orderBy(DB::raw('If(saleprice >0, saleprice,price)'), $sort)->paginate(12);
         try {
+
+
+            $product = new Product();
+            $type = new Typeproduct();
+            $sort = $req->input('sort', 'asc');
+            $typename = $req->input('type');
+            $page = $req->input('p');
+            $idType = $type->where('name', $typename)->value('id');
+            $getAll = $product->where('idtype', $idType)->orderBy(DB::raw('If(saleprice >0, saleprice,price)'), $sort)->paginate(12);
+            $query = DB::table('product as a')
+                ->leftJoin('reviews as b', 'b.product_id', '=', 'a.id')
+                ->select(
+                    'a.id',
+                    'a.namepd',
+                    'a.price',
+                    'a.saleprice',
+                    'a.idtype',
+                    'a.img',
+                    DB::raw('IFNULL(AVG(b.rating), 0) as avg_rating'),
+                    DB::raw('COUNT(b.id) as total_reviews')
+                )
+                ->where('a.idtype', $idType)
+                ->groupBy('a.id', 'a.namepd', 'a.price', 'a.saleprice', 'a.idtype', 'a.img');
+            if ($sort === 'asc' || $sort === 'desc') {
+                $query->orderBy(DB::raw('IF(saleprice > 0, saleprice, price)'), $sort);
+            } else {
+                $query->orderBy('id', 'desc'); // Mặc định sắp xếp theo id nếu không có $sort
+            }
+            $data = $query->paginate($page);
             return response()->json([
                 'success' => true,
-                'data' => $getAll,
+                'data' => $data,
 
             ]);
         } catch (\Throwable $e) {
@@ -321,21 +344,21 @@ class ProductController extends Controller
     }
     function getType(Request $req)
     {
-      try {
-        $typeProduct = new Typeproduct();
+        try {
+            $typeProduct = new Typeproduct();
 
-        $allTypes = $typeProduct::all();
+            $allTypes = $typeProduct::all();
 
-        return response()->json([
-            'success' => true,
-            'data' => $allTypes
-        ]);
-      } catch (\Exception $e) {
-        return response()->json([
-            'success' => false,
-            'data' => $e->getMessage()
-        ]);
-      }
+            return response()->json([
+                'success' => true,
+                'data' => $allTypes
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'data' => $e->getMessage()
+            ]);
+        }
     }
     function showDetailProduct($id)
     {
